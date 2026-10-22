@@ -73,6 +73,7 @@ class JobDescriptionResponse(BaseModel):
 #     preferences: Optional[str] = "default"
 
 class TailoredResume(BaseModel):
+    summary: str = ""
     name: str = ""
     email: str = ""
     phone: str = ""

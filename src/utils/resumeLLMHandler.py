@@ -32,7 +32,7 @@ class ResumeLLMHandler:
                     "Content-Type": "application/json",
                 },
                 data=json.dumps({
-                    "model": "recursive/flint-v1.0:free",
+                    "model": "dots-studio/dots-3-note-preview:free",
                     "messages": [
                         { 
                             "role": "user",
@@ -136,11 +136,11 @@ class ResumeLLMHandler:
         prompt = ENHANCE_RESUME_PROMPT_TEMPLATE.replace("{jd_text}", jd_text).replace("{resume_data_json}", json.dumps(resume_data))
         parsed_data = await self._llm_handler(prompt)
         logger.info(f"Enhanced resume data: {parsed_data}")
-        logger.info(f"Enhanced resume data: {resume_data}")
-        logger.info(f"resume_data type : {type(resume_data)}")
+        logger.info(f"Original resume data: {resume_data}")
+        # logger.info(f"resume_data type : {type(resume_data)}")
         if parsed_data and isinstance(parsed_data, dict):
             # Copy contact info from original
-            parsed_data["name"] = resume_data.get("name", "Simran Dhanai") or parsed_data.get("name", "")
+            parsed_data["name"] = resume_data.get("name") or parsed_data.get("name", "")
             parsed_data["email"] = resume_data.get("email") or parsed_data.get("email", "")
             parsed_data["phone"] = resume_data.get("phone") or parsed_data.get("phone", "")
             parsed_data["github"] = resume_data.get("github") or parsed_data.get("github", "")
@@ -151,10 +151,11 @@ class ResumeLLMHandler:
             parsed_data["hackerrank_profile_link"] = resume_data.get("hackerrank_profile_link") or parsed_data.get("hackerrank_profile_link", "")
             
             # Copy other sections unharmed
-            parsed_data["projects"] = resume_data.get("projects") or parsed_data.get("projects", [])
-            parsed_data["positions_of_responsibility"] = resume_data.get("positions_of_responsibility") or parsed_data.get("positions_of_responsibility", [])
-            parsed_data["achievements"] = resume_data.get("achievements") or parsed_data.get("achievements", [])
-            parsed_data["extra_curricular_activities"] = resume_data.get("extra_curricular_activities") or parsed_data.get("extra_curricular_activities", [])
+            parsed_data["summary"] = parsed_data.get("summary", None)
+            parsed_data["projects"] = parsed_data.get("projects") or resume_data.get("projects", []) 
+            parsed_data["positions_of_responsibility"] = parsed_data.get("positions_of_responsibility") or resume_data.get("positions_of_responsibility", [])
+            parsed_data["achievements"] = parsed_data.get("achievements") or resume_data.get("achievements", [])
+            parsed_data["extra_curricular_activities"] = parsed_data.get("extra_curricular_activities") or resume_data.get("extra_curricular_activities", []) 
             
             # logger.info(f"Enhanced resume data: {parsed_data}")
             try:

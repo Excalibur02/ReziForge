@@ -33,7 +33,7 @@ class ResumePDFGenerator:
         template_dir = os.path.join(os.path.dirname(__file__), "templates")
         self.env = Environment(loader=FileSystemLoader(template_dir))
         # Updated to use the recently created resume_basic_3.html template
-        self.template_name = "resume_basic.html"
+        self.template_name = "resume_basic_3.html"
         
     def render_html(self) -> str:
         """Renders the resume data into the HTML template."""

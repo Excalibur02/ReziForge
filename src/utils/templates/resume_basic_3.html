@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ resume.name }} - Resume</title>
 
     <style>
@@ -11,37 +12,44 @@
             margin: 10mm;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
             color: #222;
-            font-size: 11pt;
-            line-height: 1.2;
+            font-size: 10pt;
+            line-height: 1.25;
         }
 
         .page {
-            height: 277mm;
-            /* A4 minus margins */
-            overflow: hidden;
+            width: 100%;
+            min-height: 0;
+            height: auto;
+            overflow: visible;
         }
 
         header {
             text-align: center;
             margin-bottom: 8px;
             border-bottom: 1.5px solid #000;
-            padding-bottom: 4px;
+            padding-bottom: 5px;
         }
 
         h1 {
-            margin: 0;
-            font-size: 18pt;
-            letter-spacing: 1px;
+            margin: 0 0 4px;
+            font-size: 20pt;
+            letter-spacing: 0.5px;
+            line-height: 1.15;
         }
 
         .contact-info {
             font-size: 9pt;
-            margin-top: 2px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
         }
 
         .contact-info a {
@@ -51,18 +59,33 @@
 
         h2 {
             font-size: 11pt;
-            margin: 5px 0 3px;
+            margin: 7px 0 4px;
+            padding-bottom: 2px;
             border-bottom: 1px solid #000;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        p {
+            margin: 2px 0 5px;
         }
 
         .entry {
-            margin-bottom: 2px;
+            margin-bottom: 5px;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
 
         .entry-header {
             display: flex;
             justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .entry-main {
+            flex: 1;
+            min-width: 0;
         }
 
         .entry-title {
@@ -71,29 +94,77 @@
 
         .entry-subtitle {
             font-style: italic;
-            font-size: 10pt;
+            font-size: 9.5pt;
         }
 
         .entry-date {
-            font-size: 10pt;
+            font-size: 9pt;
             white-space: nowrap;
+            text-align: right;
+        }
+
+        .cgpa {
+            font-size: 9.5pt;
+            margin-top: 1px;
         }
 
         ul {
-            margin: 2px 0 2px 14px;
+            margin: 3px 0 2px 16px;
             padding: 0;
         }
 
         li {
-            margin-bottom: 1px;
+            margin-bottom: 2px;
+            padding-left: 1px;
         }
 
         .skills {
-            font-size: 10pt;
+            font-size: 9.5pt;
         }
 
-        .cgpa {
-            font-size: 10pt;
+        .skill-row {
+            margin-bottom: 2px;
+        }
+
+        .project-link {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .project-tech {
+            font-size: 9pt;
+            font-style: italic;
+        }
+
+        .summary {
+            margin: 2px 0 5px;
+            line-height: 1.35;
+            text-align: justify;
+        }
+
+        .section-list {
+            margin-top: 2px;
+        }
+
+        a {
+            overflow-wrap: anywhere;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .page {
+                overflow: visible;
+            }
+
+            h2 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
         }
     </style>
 </head>
@@ -101,119 +172,236 @@
 <body>
     <div class="page">
 
+        <!-- 1. CONTACT DETAILS -->
         <header>
-            <h1>{{ resume.name }}</h1>
+            <h1>{{ resume.name | default('', true) }}</h1>
+
             <div class="contact-info">
-                {{ resume.email }} | {{ resume.phone }} |
-                {% if resume.linkedin %}<a href="{{ resume.linkedin }}">LinkedIn</a> | {% endif %}
-                {% if resume.github %}<a href="{{ resume.github }}">GitHub</a> | {% endif %}
-                {% if resume.leetcode_profile_link %}<a href="{{ resume.leetcode_profile_link }}">LeetCode</a> | {%
-                endif %}
-                {% if resume.codeforces_profile_link %}<a href="{{ resume.codeforces_profile_link }}">Codeforces</a> |
+                {% set contacts = [] %}
+
+                {% if resume.email %}
+                {% set _ = contacts.append(
+                '<a href="mailto:' ~ resume.email ~ '">' ~ resume.email ~ '</a>'
+                ) %}
                 {% endif %}
-                {% if resume.codechef_profile_link %}<a href="{{ resume.codechef_profile_link }}">CodeChef</a>{% endif
-                %}
+
+                {% if resume.phone %}
+                {% set _ = contacts.append(resume.phone | e) %}
+                {% endif %}
+
+                {% if resume.linkedin %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.linkedin | e ~ '">LinkedIn</a>'
+                ) %}
+                {% endif %}
+
+                {% if resume.github %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.github | e ~ '">GitHub</a>'
+                ) %}
+                {% endif %}
+
+                {% if resume.leetcode_profile_link %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.leetcode_profile_link | e ~ '">LeetCode</a>'
+                ) %}
+                {% endif %}
+
+                {% if resume.codeforces_profile_link %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.codeforces_profile_link | e ~ '">Codeforces</a>'
+                ) %}
+                {% endif %}
+
+                {% if resume.codechef_profile_link %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.codechef_profile_link | e ~ '">CodeChef</a>'
+                ) %}
+                {% endif %}
+
+                {% if resume.hackerrank_profile_link %}
+                {% set _ = contacts.append(
+                '<a href="' ~ resume.hackerrank_profile_link | e ~ '">HackerRank</a>'
+                ) %}
+                {% endif %}
+
+                {{ contacts | join(' | ') | safe }}
             </div>
         </header>
 
-        {% if resume.education %}
-        <h2>Education</h2>
-        {% for ed in resume.education %}
-        <div class="entry">
-            <div class="entry-header">
-                <div>
-                    <span class="entry-title">{{ ed.degree }}</span>,
-                    <span class="entry-subtitle">{{ ed.institution }}</span>
-                </div>
-                <div class="entry-date">{{ ed.end_year }}</div>
-            </div>
-            {% if ed.cgpa_percentage %}
-            <div class="cgpa">CGPA/Percentage: <strong>{{ ed.cgpa_percentage }}</strong></div>
-            {% endif %}
-        </div>
-        {% endfor %}
+
+        <!-- 2. PROFESSIONAL SUMMARY -->
+        {% if resume.summary %}
+        <section>
+            <h2>Professional Summary</h2>
+            <p class="summary">{{ resume.summary }}</p>
+        </section>
         {% endif %}
 
-        {% if resume.experience %}
-        <h2>Experience</h2>
-        {% for exp in resume.experience %}
-        <div class="entry">
-            <div class="entry-header">
-                <div>
-                    <span class="entry-title">{{ exp.role }}</span>,
-                    <span class="entry-subtitle">{{ exp.company }}</span>
-                </div>
-                <div class="entry-date">{{ exp.duration }}</div>
-            </div>
-            <ul>
-                {% for desc in exp.description[:3] %}
-                <li>{{ desc }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endfor %}
-        {% endif %}
 
-        {% if resume.projects %}
-        <h2>Projects</h2>
-        {% for proj in resume.projects %}
-        <div class="entry">
-            <div class="entry-header">
-                <div>
-                    <a href="{{ proj.project_link }}" class="entry-title" style="text-decoration: none; color: #000;">{{
-                        proj.name }}</a>
-                    {% if proj.tech_stack %}
-                    <span class="entry-subtitle">({{ proj.tech_stack | join(', ') }})</span>
+        <!-- 3. EDUCATION -->
+        {% if resume.academic_qualifications %}
+        <section>
+            <h2>Education</h2>
+
+            {% for ed in resume.academic_qualifications %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-main">
+                        <span class="entry-title">
+                            {{ ed.degree | default('', true) }}
+                        </span>
+
+                        {% if ed.institution %}
+                        <span class="entry-subtitle">
+                            — {{ ed.institution }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if ed.end_year %}
+                    <div class="entry-date">
+                        {{ ed.end_year }}
+                    </div>
                     {% endif %}
                 </div>
-                <div class="entry-date">{{ proj.duration }}</div>
+
+                {% if ed.cgpa_percentage %}
+                <div class="cgpa">
+                    CGPA/Percentage:
+                    <strong>{{ ed.cgpa_percentage }}</strong>
+                </div>
+                {% endif %}
             </div>
-            <ul>
-                {% for desc in proj.description[:3] %}
-                <li>{{ desc }}</li>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+
+        <!-- 4. EXPERIENCE — ONLY IF NONEMPTY -->
+        {% if resume.experience %}
+        <section>
+            <h2>Experience</h2>
+
+            {% for exp in resume.experience %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-main">
+                        <span class="entry-title">
+                            {{ exp.role | default('', true) }}
+                        </span>
+
+                        {% if exp.company %}
+                        <span class="entry-subtitle">
+                            — {{ exp.company }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if exp.duration %}
+                    <div class="entry-date">
+                        {{ exp.duration }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if exp.description %}
+                <ul>
+                    {% for desc in exp.description %}
+                    <li>{{ desc }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+
+        <!-- 5. PROJECTS -->
+        {% if resume.projects %}
+        <section>
+            <h2>Projects</h2>
+
+            {% for proj in resume.projects %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-main">
+                        {% if proj.project_link %}
+                        <a href="{{ proj.project_link | e }}" class="project-link">
+                            {{ proj.name | default('Project', true) }}
+                        </a>
+                        {% else %}
+                        <span class="entry-title">
+                            {{ proj.name | default('Project', true) }}
+                        </span>
+                        {% endif %}
+
+                        {% if proj.tech_stack %}
+                        <div class="project-tech">
+                            {{ proj.tech_stack | join(', ') }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if proj.duration %}
+                    <div class="entry-date">
+                        {{ proj.duration }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if proj.description %}
+                <ul>
+                    {% for desc in proj.description %}
+                    <li>{{ desc }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+
+        <!-- 6. ACHIEVEMENTS — ONLY IF NONEMPTY -->
+        {% if resume.achievements %}
+        <section>
+            <h2>Achievements</h2>
+
+            <ul class="section-list">
+                {% for ach in resume.achievements %}
+                <li>
+                    {% if ach is mapping %}
+                    {{ ach.description | default('', true) }}
+                    {% else %}
+                    {{ ach }}
+                    {% endif %}
+                </li>
                 {% endfor %}
             </ul>
-        </div>
-        {% endfor %}
+        </section>
         {% endif %}
 
 
-        {% if resume.skills %}
-        <h2>Skills</h2>
-        <div class="skills">
-            {% if resume.skills.technical_skills %}
-            <div><strong>Technical Skills:</strong> {{ resume.skills.technical_skills | join(', ') }}</div>
-            {% endif %}
-            {% if resume.skills.tools %}
-            <div><strong>Tools:</strong> {{ resume.skills.tools | join(', ') }}</div>
-            {% endif %}
-            {% if resume.skills.soft_skills %}
-            <div><strong>Soft Skills:</strong> {{ resume.skills.soft_skills | join(', ') }}</div>
-            {% endif %}
-            {% if resume.skills.courses %}
-            <div><strong>Courses:</strong> {{ resume.skills.courses | join(', ') }}</div>
-            {% endif %}
-        </div>
-        {% endif %}
-
-        {% if resume.achievements %}
-        <h2>Achievements</h2>
-        <ul>
-            {% for ach in resume.achievements[:5] %}
-            <li>{{ ach.description }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-
+        <!-- 7. EXTRA-CURRICULAR ACTIVITIES — ONLY IF NONEMPTY -->
         {% if resume.extra_curricular_activities %}
-        <h2>Extra-curricular Activities</h2>
-        <ul>
-            {% for ext in resume.extra_curricular_activities %}
-            <li>{{ ext }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+        <section>
+            <h2>Extra-curricular Activities</h2>
 
+            <ul class="section-list">
+                {% for activity in resume.extra_curricular_activities %}
+                <li>
+                    {% if activity is mapping %}
+                    {{ activity.description | default('', true) }}
+                    {% else %}
+                    {{ activity }}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
 
     </div>
 </body>
