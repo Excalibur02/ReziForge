@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.name }} - Resume</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #222;
+            font-size: 11pt;
+            line-height: 1.2;
+        }
+
+        .page {
+            height: 277mm;
+            /* A4 minus margins */
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18pt;
+            letter-spacing: 1px;
+        }
+
+        .contact-info {
+            font-size: 9pt;
+            margin-top: 2px;
+        }
+
+        .contact-info a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 11pt;
+            margin: 5px 0 3px;
+            border-bottom: 1px solid #000;
+            text-transform: uppercase;
+        }
+
+        .entry {
+            margin-bottom: 2px;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .entry-title {
+            font-weight: bold;
+        }
+
+        .entry-subtitle {
+            font-style: italic;
+            font-size: 10pt;
+        }
+
+        .entry-date {
+            font-size: 10pt;
+            white-space: nowrap;
+        }
+
+        ul {
+            margin: 2px 0 2px 14px;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 1px;
+        }
+
+        .skills {
+            font-size: 10pt;
+        }
+
+        .cgpa {
+            font-size: 10pt;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+
+        <header>
+            <h1>{{ resume.name }}</h1>
+            <div class="contact-info">
+                {{ resume.email }} | {{ resume.phone }} |
+                {% if resume.linkedin %}<a href="{{ resume.linkedin }}">LinkedIn</a> | {% endif %}
+                {% if resume.github %}<a href="{{ resume.github }}">GitHub</a> | {% endif %}
+                {% if resume.leetcode_profile_link %}<a href="{{ resume.leetcode_profile_link }}">LeetCode</a> | {%
+                endif %}
+                {% if resume.codeforces_profile_link %}<a href="{{ resume.codeforces_profile_link }}">Codeforces</a> |
+                {% endif %}
+                {% if resume.codechef_profile_link %}<a href="{{ resume.codechef_profile_link }}">CodeChef</a>{% endif
+                %}
+            </div>
+        </header>
+
+        {% if resume.education %}
+        <h2>Education</h2>
+        {% for ed in resume.education %}
+        <div class="entry">
+            <div class="entry-header">
+                <div>
+                    <span class="entry-title">{{ ed.degree }}</span>,
+                    <span class="entry-subtitle">{{ ed.institution }}</span>
+                </div>
+                <div class="entry-date">{{ ed.end_year }}</div>
+            </div>
+            {% if ed.cgpa_percentage %}
+            <div class="cgpa">CGPA/Percentage: <strong>{{ ed.cgpa_percentage }}</strong></div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.experience %}
+        <h2>Experience</h2>
+        {% for exp in resume.experience %}
+        <div class="entry">
+            <div class="entry-header">
+                <div>
+                    <span class="entry-title">{{ exp.role }}</span>,
+                    <span class="entry-subtitle">{{ exp.company }}</span>
+                </div>
+                <div class="entry-date">{{ exp.duration }}</div>
+            </div>
+            <ul>
+                {% for desc in exp.description[:3] %}
+                <li>{{ desc }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.projects %}
+        <h2>Projects</h2>
+        {% for proj in resume.projects %}
+        <div class="entry">
+            <div class="entry-header">
+                <div>
+                    <a href="{{ proj.project_link }}" class="entry-title" style="text-decoration: none; color: #000;">{{
+                        proj.name }}</a>
+                    {% if proj.tech_stack %}
+                    <span class="entry-subtitle">({{ proj.tech_stack | join(', ') }})</span>
+                    {% endif %}
+                </div>
+                <div class="entry-date">{{ proj.duration }}</div>
+            </div>
+            <ul>
+                {% for desc in proj.description[:3] %}
+                <li>{{ desc }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+
+        {% if resume.skills %}
+        <h2>Skills</h2>
+        <div class="skills">
+            {% if resume.skills.technical_skills %}
+            <div><strong>Technical Skills:</strong> {{ resume.skills.technical_skills | join(', ') }}</div>
+            {% endif %}
+            {% if resume.skills.tools %}
+            <div><strong>Tools:</strong> {{ resume.skills.tools | join(', ') }}</div>
+            {% endif %}
+            {% if resume.skills.soft_skills %}
+            <div><strong>Soft Skills:</strong> {{ resume.skills.soft_skills | join(', ') }}</div>
+            {% endif %}
+            {% if resume.skills.courses %}
+            <div><strong>Courses:</strong> {{ resume.skills.courses | join(', ') }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if resume.achievements %}
+        <h2>Achievements</h2>
+        <ul>
+            {% for ach in resume.achievements[:5] %}
+            <li>{{ ach.description }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if resume.extra_curricular_activities %}
+        <h2>Extra-curricular Activities</h2>
+        <ul>
+            {% for ext in resume.extra_curricular_activities %}
+            <li>{{ ext }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+
+    </div>
+</body>
+
+</html>
