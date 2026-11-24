@@ -1,27 +1,28 @@
-# Python
-.venv/
-server/venv/
-__pycache__/
+# Python & Backend
+**/__pycache__/
 *.py[cod]
 *$py.class
-*.pytest_cache/
+Backend/.venv/
+Backend/server/venv/
+Backend/*.pytest_cache/
+Backend/sessions/
+Backend/temp_folder/
+Backend/*.pdf
+Backend/*.json
 
-# Local Resume data
-
-
-# env and secrets
+# Environment variables & secrets
 *.env
 .env
+.env.*
 
-# Node & IDE
-node_modules/
-.idea/
+# Node & Frontend
+**/node_modules/
+Frontend/dist/
+Frontend/dist-ssr/
+*.local
+
+# Editor & OS files
 .vscode/
-
-# dummy in-between pdfs
-*.pdf
-*.json
-
-
-# extra files
-temp_folder/
+.idea/
+.DS_Store
+Thumbs.db

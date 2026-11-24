@@ -1,0 +1,27 @@
+# Python
+.venv/
+server/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Local Resume data
+
+
+# env and secrets
+*.env
+.env
+
+# Node & IDE
+node_modules/
+.idea/
+.vscode/
+
+# dummy in-between pdfs
+*.pdf
+*.json
+
+
+# extra files
+temp_folder/

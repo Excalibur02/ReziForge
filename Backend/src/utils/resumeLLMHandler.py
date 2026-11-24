@@ -6,7 +6,8 @@ from src.models.models import ResumeParsed, TailoredResume
 from src.utils.prompts import (
     PARSE_RESUME_PROMPT_TEMPLATE, 
     EXTRACT_JD_KEYWORDS_PROMPT_TEMPLATE, 
-    ENHANCE_RESUME_PROMPT_TEMPLATE
+    ENHANCE_RESUME_PROMPT_TEMPLATE,
+    ENHANCE_RESUME_MBA_PROMPT_TEMPLATE
 )
 from src.config.settings import settings
 from src.config.logging import logger
@@ -32,7 +33,7 @@ class ResumeLLMHandler:
                     "Content-Type": "application/json",
                 },
                 data=json.dumps({
-                    "model": "dots-studio/dots-3-note-preview:free",
+                    "model": "nvidia/nemotron-3.5-lightning:free",
                     "messages": [
                         { 
                             "role": "user",
@@ -130,10 +131,20 @@ class ResumeLLMHandler:
         return []
 
 
-    async def enhance_resume(self, resume_data: dict, jd_text: str) -> Optional[TailoredResume]:
+    async def enhance_resume(self, resume_data: dict, jd_text: str = "", domain: str = "swe", target_role: str = "Software Engineer") -> Optional[TailoredResume]:
         if isinstance(resume_data, str):
             resume_data = json.loads(resume_data)
-        prompt = ENHANCE_RESUME_PROMPT_TEMPLATE.replace("{jd_text}", jd_text).replace("{resume_data_json}", json.dumps(resume_data))
+        
+        # Select appropriate prompt based on target domain (SWE vs MBA)
+        if domain == "mba" or "mba" in domain.lower() or "business" in domain.lower() or "management" in domain.lower():
+            template = ENHANCE_RESUME_MBA_PROMPT_TEMPLATE
+        else:
+            template = ENHANCE_RESUME_PROMPT_TEMPLATE
+
+        prompt = template.replace("{jd_text}", jd_text or "General Industry Requirements").replace(
+            "{resume_data_json}", json.dumps(resume_data)
+        ).replace("{target_role}", target_role or "Professional")
+
         parsed_data = await self._llm_handler(prompt)
         logger.info(f"Enhanced resume data: {parsed_data}")
         logger.info(f"Original resume data: {resume_data}")
@@ -181,11 +192,11 @@ class ResumeLLMHandler:
         return json.dumps(resume_data.model_dump())
 
 
-    async def enhanced_resume_json(self, resume_file: str, jd_text: str) -> str:
+    async def enhanced_resume_json(self, resume_file: str, jd_text: str = "", domain: str = "swe", target_role: str = "Software Engineer") -> str:
         resume_data = await self.basic_resume_json(resume_file)
         if resume_data is None:
             raise Exception("Failed to parse resume from text. Please check the API exception output above.")
-        enhanced_resume = await self.enhance_resume(resume_data, jd_text)
+        enhanced_resume = await self.enhance_resume(resume_data, jd_text, domain=domain, target_role=target_role)
         if enhanced_resume is None:
             raise Exception("Failed to enhance resume. Please check the API exception output above.")
         return json.dumps(enhanced_resume.model_dump())
