@@ -225,7 +225,7 @@ export default function LandingPage({ onGetStarted }) {
         color: '#606553',
         fontSize: '0.85rem'
       }}>
-        Designed with minimalism and intention • ElevateCV 2026
+        Designed with minimalism and intention • ReziForge 2026
       </footer>
     </div>
   );
